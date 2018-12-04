@@ -3,30 +3,25 @@ package com.opensource.svgaplayer
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.text.Layout
-import android.text.SpannableString
 import android.text.StaticLayout
 import android.text.TextPaint
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.logging.Handler
 
 /**
  * Created by cuiminghui on 2017/3/30.
  */
 class SVGADynamicEntity {
 
-    internal var dynamicHidden: HashMap<String, Boolean> = hashMapOf()
+    var dynamicHidden: HashMap<String, Boolean> = hashMapOf()
 
-    internal var dynamicImage: HashMap<String, Bitmap> = hashMapOf()
+    var dynamicImage: HashMap<String, Bitmap> = hashMapOf()
 
-    internal var dynamicText: HashMap<String, String> = hashMapOf()
+    var dynamicText: HashMap<String, String> = hashMapOf()
 
-    internal var dynamicTextPaint: HashMap<String, TextPaint> = hashMapOf()
+    var dynamicTextPaint: HashMap<String, TextPaint> = hashMapOf()
 
-    internal var dynamicLayoutText: HashMap<String, StaticLayout> = hashMapOf()
+    var dynamicLayoutText: HashMap<String, StaticLayout> = hashMapOf()
 
     internal var dynamicDrawer: HashMap<String, (canvas: Canvas, frameIndex: Int) -> Boolean> = hashMapOf()
 
@@ -42,7 +37,7 @@ class SVGADynamicEntity {
 
     fun setDynamicImage(url: String, forKey: String) {
         val handler = android.os.Handler()
-        Thread({
+        Thread {
             try {
                 (URL(url).openConnection() as? HttpURLConnection)?.let {
                     it.connectTimeout = 20 * 1000
@@ -56,7 +51,7 @@ class SVGADynamicEntity {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }).start()
+        }.start()
     }
 
     fun setDynamicText(text: String, textPaint: TextPaint, forKey: String) {
