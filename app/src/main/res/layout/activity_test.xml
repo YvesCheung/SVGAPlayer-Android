@@ -22,6 +22,11 @@
         android:onClick="loadSVGAFromNetworkAndAddText"
         android:text="load from network and add text" />
 
+    <TextView
+        android:id="@+id/tv_assets_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <com.opensource.svgaplayer.SVGAImageView
         android:id="@+id/iv_img"
         android:layout_width="300dp"

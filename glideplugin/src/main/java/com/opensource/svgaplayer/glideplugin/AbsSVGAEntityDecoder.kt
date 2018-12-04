@@ -2,7 +2,6 @@ package com.opensource.svgaplayer.glideplugin
 
 import android.util.Log
 import java.io.InputStream
-import java.io.InputStreamReader
 
 /**
  * Created by 张宇 on 2018/11/27.
@@ -22,10 +21,9 @@ internal abstract class AbsSVGAEntityDecoder {
      * Note: don't close the inputStream!
      */
     protected fun readHeadAsBytes(inputStream: InputStream): ByteArray? = attempt {
-
         val byteArray = ByteArray(4)
         val count = inputStream.read(byteArray, 0, 4)
-        return if (count <= 0) {
+        if (count <= 0) {
             null
         } else {
             byteArray
