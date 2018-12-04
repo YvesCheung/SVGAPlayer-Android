@@ -60,7 +60,7 @@ internal class SVGAEntityFileDecoder(
             FileInputStream(jsonFile).use { fileInputStream ->
                 ByteArrayOutputStream().use { byteArrayOutputStream ->
                     while (true) {
-                        val size = fileInputStream.read(buffer, 0, buffer.size)
+                        val size = fileInputStream.read(buffer)
                         if (size == -1) {
                             break
                         }

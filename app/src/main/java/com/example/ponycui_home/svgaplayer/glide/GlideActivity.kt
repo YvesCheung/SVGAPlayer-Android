@@ -25,6 +25,14 @@ import kotlinx.android.synthetic.main.activity_test.*
 class GlideActivity : AppCompatActivity() {
 
     private val svgaFiles = mapOf(
+        "" to listOf(
+            "alarm",
+            "angel",
+            "EmptyState",
+            "heartbeat",
+            "posche",
+            "rose_1.5.0",
+            "rose_2.0.0"),
         "norsvga" to listOf(
             "logo-revenge-start",
             "logo-start"),
@@ -59,13 +67,16 @@ class GlideActivity : AppCompatActivity() {
     private fun loadAssetFileUrl() {
         svgaFiles.entries.forEach { (path, list) ->
             list.forEach { fileName ->
-                fileUrl.add("$path/$fileName.svga")
+                if (path.isBlank()) {
+                    fileUrl.add("$fileName.svga")
+                } else {
+                    fileUrl.add("$path/$fileName.svga")
+                }
             }
         }
     }
 
     fun loadSVGAFromNetwork(v: View) {
-        curIdx = ++curIdx % fileUrl.size
         val url = "https://github.com/YvesCheung/SVGAPlayer-Android/" +
             "raw/master/app/src/main/assets/${fileUrl[curIdx]}"
         loadSVGAFromUrl(url)
@@ -77,6 +88,7 @@ class GlideActivity : AppCompatActivity() {
     }
 
     private fun loadSVGAFromUrl(url: String) {
+        curIdx = ++curIdx % fileUrl.size
         tv_assets_name.text = url
         Glide.with(this).load(url).into(iv_img)
     }
