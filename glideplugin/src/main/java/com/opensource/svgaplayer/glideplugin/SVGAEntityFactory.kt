@@ -1,6 +1,7 @@
 package com.opensource.svgaplayer.glideplugin
 
 import android.net.Uri
+import com.bumptech.glide.load.data.DataRewinder
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
@@ -15,12 +16,15 @@ import java.io.InputStream
  * E-mail: zhangyu4@yy.com
  * YY: 909017428
  */
-internal class SVGAUrlLoaderFactory(private val cachePath: String) : ModelLoaderFactory<GlideUrl, File> {
+internal class SVGAUrlLoaderFactory(
+    private val cachePath: String,
+    private val obtainRewind: (InputStream) -> DataRewinder<InputStream>
+) : ModelLoaderFactory<GlideUrl, File> {
 
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<GlideUrl, File> {
         return SVGAEntityUrlLoader(
             multiFactory.build(GlideUrl::class.java, InputStream::class.java),
-            cachePath)
+            cachePath, obtainRewind)
     }
 
     override fun teardown() {
@@ -28,13 +32,15 @@ internal class SVGAUrlLoaderFactory(private val cachePath: String) : ModelLoader
     }
 }
 
-internal class SVGAAssetLoaderFactory(private val cachePath: String) : ModelLoaderFactory<Uri, File> {
+internal class SVGAAssetLoaderFactory(
+    private val cachePath: String,
+    private val obtainRewind: (InputStream) -> DataRewinder<InputStream>
+) : ModelLoaderFactory<Uri, File> {
 
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, File> {
         return SVGAEntityAssetLoader(
             multiFactory.build(Uri::class.java, InputStream::class.java),
-            cachePath
-        )
+            cachePath, obtainRewind)
     }
 
     override fun teardown() {

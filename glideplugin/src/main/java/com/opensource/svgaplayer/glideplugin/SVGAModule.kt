@@ -33,14 +33,18 @@ class SVGAModule : LibraryGlideModule() {
         val cachePath = context.cacheDir.absolutePath
         registry
             .register(SVGAVideoEntity::class.java, SVGADrawable::class.java, SVGADrawableTranscoder())
-            .append(BUCKET_SVGA, InputStream::class.java, SVGAVideoEntity::class.java, SVGAEntityStreamDecoder(cachePath))
-            .append(BUCKET_SVGA, File::class.java, SVGAVideoEntity::class.java, SVGAEntityFileDecoder())
+            .append(BUCKET_SVGA, InputStream::class.java, SVGAVideoEntity::class.java,
+                SVGAEntityStreamDecoder(cachePath, glide.arrayPool))
+            .append(BUCKET_SVGA, File::class.java, SVGAVideoEntity::class.java,
+                SVGAEntityFileDecoder(glide.arrayPool))
             // Uri for file://android_asset
-            .append(Uri::class.java, File::class.java, SVGAAssetLoaderFactory(cachePath))
+            .append(Uri::class.java, File::class.java, SVGAAssetLoaderFactory(cachePath, registry::getRewinder))
             // String/Uri/GlideUrl for http:/https:
             .append(String::class.java, File::class.java, SVGAStringLoaderFactory())
             .append(Uri::class.java, File::class.java, SVGAUriLoaderFactory())
-            .append(GlideUrl::class.java, File::class.java, SVGAUrlLoaderFactory(cachePath))
+            .append(GlideUrl::class.java, File::class.java, SVGAUrlLoaderFactory(cachePath, registry::getRewinder))
+            // encode to disk
+            .append(File::class.java, SVGAFileEncoder())
     }
 
     private fun hookTheImageViewFactory(glide: Glide) {
@@ -59,3 +63,4 @@ class SVGAModule : LibraryGlideModule() {
         }
     }
 }
+

@@ -20,7 +20,7 @@ internal abstract class AbsSVGAEntityDecoder {
     /**
      * Note: don't close the inputStream!
      */
-    protected fun readHeadAsBytes(inputStream: InputStream): ByteArray? = try {
+    protected fun readHeadAsBytes(inputStream: InputStream): ByteArray? = attempt {
         val byteArray = ByteArray(4)
         val count = inputStream.read(byteArray, 0, 4)
         if (count <= 0) {
@@ -28,10 +28,6 @@ internal abstract class AbsSVGAEntityDecoder {
         } else {
             byteArray
         }
-    } catch (e: Exception) {
-        null
-    } finally {
-        inputStream.reset()
     }
 
     protected inline fun <T : Any> attempt(action: () -> T?): T? {

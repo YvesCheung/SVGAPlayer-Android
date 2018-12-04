@@ -56,12 +56,6 @@ class GlideActivity : AppCompatActivity() {
         loadAssetFileUrl()
     }
 
-    fun loadSVGAFromNetwork(v: View) {
-        Glide.with(this)
-            .load("https://github.com/yyued/SVGA-Samples/blob/master/kingset.svga?raw=true")
-            .into(iv_img)
-    }
-
     private fun loadAssetFileUrl() {
         svgaFiles.entries.forEach { (path, list) ->
             list.forEach { fileName ->
@@ -70,14 +64,21 @@ class GlideActivity : AppCompatActivity() {
         }
     }
 
-    fun loadSVGAFromAssets(v: View) {
-        val fileName = "file:///android_asset/${fileUrl[curIdx]}"
-        tv_assets_name.text = fileName
-        tv_assets_name.visibility = View.VISIBLE
-        Glide.with(this)
-            .load(fileName)
-            .into(iv_img)
+    fun loadSVGAFromNetwork(v: View) {
         curIdx = ++curIdx % fileUrl.size
+        val url = "https://github.com/YvesCheung/SVGAPlayer-Android/" +
+            "raw/master/app/src/main/assets/${fileUrl[curIdx]}"
+        loadSVGAFromUrl(url)
+    }
+
+    fun loadSVGAFromAssets(v: View) {
+        val fileUrl = "file:///android_asset/${fileUrl[curIdx]}"
+        loadSVGAFromUrl(fileUrl)
+    }
+
+    private fun loadSVGAFromUrl(url: String) {
+        tv_assets_name.text = url
+        Glide.with(this).load(url).into(iv_img)
     }
 
     fun loadSVGAFromNetworkAndAddText(v: View) {

@@ -5,6 +5,7 @@ import com.bumptech.glide.Priority
 import com.bumptech.glide.load.Key
 import com.bumptech.glide.load.Options
 import com.bumptech.glide.load.data.DataFetcher
+import com.bumptech.glide.load.data.DataRewinder
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.signature.ObjectKey
 import java.io.File
@@ -22,7 +23,8 @@ import java.util.zip.ZipInputStream
  */
 abstract class SVGAEntityLoader<MODEL : Any>(
     private val actual: ModelLoader<MODEL, InputStream>,
-    private val cachePath: String
+    private val cachePath: String,
+    private val obtainRewind: (InputStream) -> DataRewinder<InputStream>
 ) : ModelLoader<MODEL, File> {
 
     override fun buildLoadData(model: MODEL, width: Int, height: Int, options: Options): ModelLoader.LoadData<File>? {
@@ -30,7 +32,11 @@ abstract class SVGAEntityLoader<MODEL : Any>(
             ?: return null
         return ModelLoader.LoadData(
             toGlideKey(model),
-            SVGAEntityFetcher(toStringKey(model), actualFetcher, cachePath))
+            SVGAEntityFetcher(
+                toStringKey(model),
+                actualFetcher,
+                cachePath,
+                obtainRewind))
     }
 
     override fun handles(model: MODEL): Boolean = actual.handles(model)
@@ -43,7 +49,8 @@ abstract class SVGAEntityLoader<MODEL : Any>(
     private class SVGAEntityFetcher(
         private val modelKey: String,
         private val fetcher: DataFetcher<InputStream>,
-        private val cachePath: String
+        private val cachePath: String,
+        private val obtainRewind: (InputStream) -> DataRewinder<InputStream>
     ) : AbsSVGAEntityDecoder(), DataFetcher<File> {
 
         private val isCanceled = AtomicBoolean()
@@ -93,17 +100,22 @@ abstract class SVGAEntityLoader<MODEL : Any>(
             if (isCanceled.get()) return null
             if (cacheDir.isDirectory && cacheDir.list().isNotEmpty()) return cacheDir
 
-            readHeadAsBytes(source)?.let { sourceHead ->
-                if (sourceHead.isZipFormat && !isCanceled.get()) {
-                    try {
-                        cacheDir.makeSureExist()
-                        unzip(source, cacheDir)
-                    } catch (e: Exception) {
-                        cacheDir.deleteRecursively()
-                        e.printStackTrace()
+            val rewind = obtainRewind(source)
+            try {
+                readHeadAsBytes(rewind.rewindAndGet())?.let { sourceHead ->
+                    if (sourceHead.isZipFormat && !isCanceled.get()) {
+                        try {
+                            cacheDir.makeSureExist()
+                            unzip(rewind.rewindAndGet(), cacheDir)
+                        } catch (e: Exception) {
+                            cacheDir.deleteRecursively()
+                            e.printStackTrace()
+                        }
+                        return cacheDir
                     }
-                    return cacheDir
                 }
+            } finally {
+                rewind.cleanup()
             }
             return null
         }
