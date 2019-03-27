@@ -1,11 +1,14 @@
 package com.opensource.svgaplayer.glideplugin
 
+import android.content.res.AssetFileDescriptor
+import android.content.res.Resources
 import android.net.Uri
 import com.bumptech.glide.load.data.DataRewinder
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.ModelLoader
 import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.bumptech.glide.load.model.MultiModelLoaderFactory
+import com.bumptech.glide.load.model.ResourceLoader
 import com.bumptech.glide.load.model.StringLoader
 import com.bumptech.glide.load.model.UrlUriLoader
 import java.io.File
@@ -69,4 +72,28 @@ internal class SVGAUriLoaderFactory : ModelLoaderFactory<Uri, File> {
         //Do Nothing
     }
 
+}
+
+internal class SVGAResourceLoaderFactory(private val resource: Resources) : ModelLoaderFactory<Int, File> {
+
+    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Int, File> {
+        return ResourceLoader(resource,
+            multiFactory.build(Uri::class.java, File::class.java))
+    }
+
+    override fun teardown() {
+        //Do Nothing
+    }
+}
+
+internal class SVGAUriResourceLoaderFactory : ModelLoaderFactory<Uri, InputStream> {
+
+    override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, InputStream> {
+        return SVGAResourceLoader(
+            multiFactory.build(Uri::class.java, AssetFileDescriptor::class.java))
+    }
+
+    override fun teardown() {
+        //Do Nothing
+    }
 }
