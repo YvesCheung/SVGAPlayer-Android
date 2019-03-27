@@ -19,8 +19,20 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="loadSVGAFromFile"
+        android:text="load from file" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:onClick="loadSVGAFromNetworkAndAddText"
         android:text="load from network and add text" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="loadSVGAFromRes"
+        android:text="load from res/raw" />
 
     <TextView
         android:id="@+id/tv_assets_name"

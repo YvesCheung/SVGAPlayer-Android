@@ -3,6 +3,7 @@ package com.example.ponycui_home.svgaplayer.glide
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.annotation.RawRes
 import android.support.v7.app.AppCompatActivity
 import android.text.Layout
 import android.text.Spannable
@@ -10,12 +11,16 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
 import com.example.ponycui_home.svgaplayer.R
 import com.opensource.svgaplayer.SVGADynamicEntity
 import com.opensource.svgaplayer.glideplugin.SVGATarget
 import kotlinx.android.synthetic.main.activity_test.*
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
 
 /**
  * Created by 张宇 on 2018/11/26.
@@ -54,7 +59,13 @@ class GlideActivity : AppCompatActivity() {
             "succ_and_upgrade")
     )
 
+    private val svgaResId = listOf(
+        R.raw.angel,
+        R.raw.yylove_death
+    )
+
     private var curIdx = 0
+    private var curResIdx = 0
 
     private val fileUrl = mutableListOf<String>()
 
@@ -85,6 +96,41 @@ class GlideActivity : AppCompatActivity() {
     fun loadSVGAFromAssets(v: View) {
         val fileUrl = "file:///android_asset/${fileUrl[curIdx]}"
         loadSVGAFromUrl(fileUrl)
+    }
+
+    fun loadSVGAFromFile(v: View) {
+        val url = "https://github.com/YvesCheung/SVGAPlayer-Android/" +
+            "raw/master/app/src/main/assets/${fileUrl[curIdx]}"
+        val file = File(externalCacheDir, fileUrl[curIdx].replace("/", "_"))
+        val buffer = ByteArray(64 * 1024)
+        Thread {
+            try {
+                with(URL(url).openConnection()) {
+                    connect()
+                    getInputStream().use { input ->
+                        FileOutputStream(file).use { output ->
+                            while (true) {
+                                val len = input.read(buffer)
+                                if (len <= 0) break
+
+                                output.write(buffer, 0, len)
+                            }
+                        }
+                    }
+                }
+
+                v.post { loadSVGAFromUrl(file.absolutePath) }
+            } catch (e: Exception) {
+                Log.e("Yves", e.message, e)
+            }
+        }.start()
+    }
+
+    fun loadSVGAFromRes(v: View) {
+        @RawRes val id = svgaResId[curResIdx]
+        tv_assets_name.text = this.resources.getResourceEntryName(id)
+        Glide.with(this).load(id).into(iv_img)
+        curResIdx = ++curResIdx % svgaResId.size
     }
 
     private fun loadSVGAFromUrl(url: String) {

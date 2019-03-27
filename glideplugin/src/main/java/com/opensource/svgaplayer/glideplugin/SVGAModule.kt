@@ -30,13 +30,19 @@ class SVGAModule : LibraryGlideModule() {
             listOf(BUCKET_SVGA, BUCKET_BITMAP, BUCKET_BITMAP_DRAWABLE, BUCKET_GIF)
         )
         hookTheImageViewFactory(glide)
+        val resources = context.resources
         val cachePath = context.cacheDir.absolutePath
+        val streamDecoder = SVGAEntityStreamDecoder(cachePath, glide.arrayPool)
         registry
             .register(SVGAVideoEntity::class.java, SVGADrawable::class.java, SVGADrawableTranscoder())
             .append(BUCKET_SVGA, InputStream::class.java, SVGAVideoEntity::class.java,
-                SVGAEntityStreamDecoder(cachePath, glide.arrayPool))
+                streamDecoder)
             .append(BUCKET_SVGA, File::class.java, SVGAVideoEntity::class.java,
                 SVGAEntityFileDecoder(glide.arrayPool))
+            // int/Uri for R.raw.resourceId
+            .append(Int::class.java, File::class.java, SVGAResourceLoaderFactory(resources))
+            .append(Int::class.javaObjectType, File::class.java, SVGAResourceLoaderFactory(resources))
+            .append(Uri::class.java, InputStream::class.java, SVGAUriResourceLoaderFactory())
             // Uri for file://android_asset
             .append(Uri::class.java, File::class.java, SVGAAssetLoaderFactory(cachePath, registry::getRewinder))
             // String/Uri/GlideUrl for http:/https:
