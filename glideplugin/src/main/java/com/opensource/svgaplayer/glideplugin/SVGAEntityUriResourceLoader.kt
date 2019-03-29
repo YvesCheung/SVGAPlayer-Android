@@ -12,7 +12,7 @@ import java.io.InputStream
 import java.lang.Exception
 import java.util.concurrent.atomic.AtomicBoolean
 
-class SVGAResourceLoader(
+class SVGAEntityUriResourceLoader(
     private val actual: ModelLoader<Uri, AssetFileDescriptor>
 ) : ModelLoader<Uri, InputStream> {
 

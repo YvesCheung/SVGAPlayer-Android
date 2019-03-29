@@ -14,8 +14,16 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.request.transition.Transition
 import com.example.ponycui_home.svgaplayer.R
+import com.opensource.svgaplayer.SVGADrawable
 import com.opensource.svgaplayer.SVGADynamicEntity
+import com.opensource.svgaplayer.SVGAVideoEntity
 import com.opensource.svgaplayer.glideplugin.SVGATarget
 import kotlinx.android.synthetic.main.activity_test.*
 import java.io.File

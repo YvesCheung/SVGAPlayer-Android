@@ -74,11 +74,28 @@ internal class SVGAUriLoaderFactory : ModelLoaderFactory<Uri, File> {
 
 }
 
-internal class SVGAResourceLoaderFactory(private val resource: Resources) : ModelLoaderFactory<Int, File> {
+internal class SVGAResourceLoaderFactory(
+    private val resource: Resources,
+    private val cachePath: String,
+    private val obtainRewinder: (InputStream) -> DataRewinder<InputStream>
+) : ModelLoaderFactory<Int, File> {
 
+    companion object {
+        /**
+         * 在RePlugin的插件中发现无法用常规方法来加载 R 的资源，
+         * 因此另外使用 [SVGAEntityIntResourceLoader] 来处理这种情况。
+         */
+        private const val RePluginMode = true
+    }
+
+    @Suppress("ConstantConditionIf")
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Int, File> {
-        return ResourceLoader(resource,
-            multiFactory.build(Uri::class.java, File::class.java))
+        return if (RePluginMode) {
+            SVGAEntityIntResourceLoader(resource, cachePath, obtainRewinder)
+        } else {
+            ResourceLoader(resource,
+                multiFactory.build(Uri::class.java, File::class.java))
+        }
     }
 
     override fun teardown() {
@@ -89,7 +106,7 @@ internal class SVGAResourceLoaderFactory(private val resource: Resources) : Mode
 internal class SVGAUriResourceLoaderFactory : ModelLoaderFactory<Uri, InputStream> {
 
     override fun build(multiFactory: MultiModelLoaderFactory): ModelLoader<Uri, InputStream> {
-        return SVGAResourceLoader(
+        return SVGAEntityUriResourceLoader(
             multiFactory.build(Uri::class.java, AssetFileDescriptor::class.java))
     }
 
